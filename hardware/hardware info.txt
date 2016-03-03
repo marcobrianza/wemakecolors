@@ -1,0 +1,5 @@
+board
+https://github.com/nodemcu/nodemcu-devkit-v1.0
+
+serial usb drivers
+https://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx
