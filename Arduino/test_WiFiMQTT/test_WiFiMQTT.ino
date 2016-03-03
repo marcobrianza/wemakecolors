@@ -13,10 +13,20 @@
 const char *ssid = "mySSID";
 const char *pass = "myPASS";
 
-const char *broker = "broker.shiftr.io";
-const char *clientId = "arduinoColor";
-const char *username = "try";
-const char *password = "try";
+
+
+//const char *broker = "broker.shiftr.io";
+//const char *username = "try";
+//const char *password = "try";
+//const char *clientId = "arduinoColor";
+
+//const char *broker = "test.mosquitto.org";
+const char *broker = "broker.hivemq.com";
+const char *username = "";
+const char *password = "";
+const char *clientId = "";
+
+
 
 WiFiClient net;
 MQTTClient client;
@@ -33,7 +43,11 @@ void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, pass);
   client.begin(broker, net);
-
+ 
+  color[0] = 1;
+  color[1] = 128;
+  color[2] = 129;
+    
   connect();
 }
 
@@ -64,11 +78,8 @@ void loop() {
   }
 
   // publish a message roughly every second.
-  if (millis() - lastMillis > 2000) {
+  if (millis() - lastMillis > 5000) {
     lastMillis = millis();
-    color[0] = 5;
-    color[1] = 6;
-    color[2] = 7;
     client.publish("/color", (char*)color, sizeof(color));
   }
 }

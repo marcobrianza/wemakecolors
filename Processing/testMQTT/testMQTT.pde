@@ -13,25 +13,23 @@ int MSG_SIZE=3;
 byte c[];
 
 color newC;
-color CC=color(127,2,3); // colors must be < 128 becauuse I think there is an encoding problem somewhere
-//color CC=color(200,2,3); // this causes issues
+color CC=color(255,2,3); 
 
 MQTTClient client;
 
 String clientID= "processingColor";
 //String mqttURL="mqtt://try:try@broker.shiftr.io";
-String mqttURL="mqtt://test.mosquitto.org";
+//String mqttURL="mqtt://test.mosquitto.org";
+String mqttURL="mqtt://broker.hivemq.com";
+
 
 void setup() {
 
-
-  c=new byte[MSG_SIZE];
-    
+  c=new byte[MSG_SIZE]; 
   
   c[0]=byte(red(CC));
   c[1]=byte(green(CC));
   c[2]=byte(blue(CC));
-
 
   client = new MQTTClient(this);
   client.connect(mqttURL, clientID);
@@ -50,8 +48,13 @@ void mousePressed() {
 void messageReceived(String topic, byte[] payload) {
   print("new message: " + topic + " - "+ payload.length+" - ");
   if ( payload.length==3) {
-    println(payload[0], payload[1], payload[2]);
-    newC=color(payload[0], payload[1], payload[2]);
+    int r,g,b;
+    r=payload[0]& 0xff;
+    g=payload[1]& 0xff;
+    b=payload[2]& 0xff;
+    
+    println(r,g,b);
+    newC=color(r,g,b);
     background(newC);
   }
 }
