@@ -2,7 +2,7 @@ Layer to slice for Laser
 
 BIG Laser Settings
 Cut: power speed=15, power 100%
-Cut-line: speed 800, power 50%
+Cut-line: speed 200, power 20%
 Engrave: speed 80, per 100%
 
 
