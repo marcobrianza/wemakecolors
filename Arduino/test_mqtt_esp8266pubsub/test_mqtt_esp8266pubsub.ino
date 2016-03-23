@@ -56,8 +56,8 @@ void setup() {
 
   //test color = teal
   myColor[0] = 1;
-  myColor[1] = 130;
-  myColor[2] = 131;
+  myColor[1] = 12;
+  myColor[2] = 12;
 }
 
 void setup_wifi() {
