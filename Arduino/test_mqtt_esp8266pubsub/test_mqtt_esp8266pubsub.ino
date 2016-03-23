@@ -33,6 +33,7 @@ const char* PASSWORD = "...";
 
 //const char* MQTT_SERVER = "test.mosquitto.org";
 const char* MQTT_SERVER = "net.marcobrianza.it";
+//const char* MQTT_SERVER = "192.168.1.128";
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
 const char* MQTT_ID = "ColorArduino";
 
@@ -45,9 +46,7 @@ byte myColor[MSG_LEN];
 byte newColor[MSG_LEN];
 int value = 0;
 
-// this is needed in Arduino 1.6.7
-void  setup_wifi();
-void callback(char* topic, byte* payload, unsigned int length);
+
 
 void setup() {
   Serial.begin(115200);
@@ -86,7 +85,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  for (unsigned int i = 0; i < length; i++) {
     Serial.print((byte)payload[i]);
     Serial.print(" ");
   }
