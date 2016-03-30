@@ -20,7 +20,8 @@ String clientID= "processingColor";
 String mqttURL="mqtt://net.marcobrianza.it";
 //String mqttURL="mqtt://try:try@broker.shiftr.io";
 //String mqttURL="mqtt://test.mosquitto.org";
-//String mqttURL="mqtt://192.168.1.129";
+//String mqttURL="mqtt://192.168.1.185";
+//String mqttURL="mqtt://localhost";
 
 void setup() {
 
@@ -64,7 +65,7 @@ void keyPressed() {
   c[1]=0;
   c[2]=0;
   } 
-  
+
    client.publish("/WeMakeColors/color", c); 
 }
 
@@ -82,28 +83,20 @@ void messageReceived(String topic, byte[] payload) {
   b=payload[2]& 0xff;
 
   println(r, g, b);
-  newC=color(calibrate(r,g,b));
+  int R=cal_lut(r);
+  int G=cal_lut(g);
+  int B=cal_lut(b);
+  
+  newC=color(R,G,B);
   background(newC);
   }
 }
 
-color calibrate(int R, int G, int B) {
-  float gamma=2.5;
-  float outRange=255;
-  float inRange=15;
+
+int cal_lut(int c){
+  if (c>15) c=15;
+  int[] lut = {0, 11, 14, 17, 21, 27, 34, 42, 53, 66, 104, 130, 163, 204, 255};
+
   
-  float rC, gC, bC;
-  color cC;
-
-  float r=float(R);
-  float g=float(G);
-  float b=float(B);
-
-  rC=pow((r/inRange), gamma)*outRange;
-  gC=pow((g/inRange), gamma)*outRange;
-  bC=pow((b/inRange), gamma)*outRange;
-
-  cC=color(rC, gC, bC); 
-
-  return(cC);
+  return lut[c];
 }

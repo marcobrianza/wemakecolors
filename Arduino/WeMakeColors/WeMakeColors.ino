@@ -5,9 +5,8 @@
 // Update these with values suitable for your network.
 //const char* SSID = "...";
 //const char* PASSWORD = "...";
+#include "config.h"
 
-const char* SSID = "PucciHome24G";
-const char* PASSWORD = "Grandebellezza3!";
 
 const char* MQTT_SERVER = "net.marcobrianza.it";
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
@@ -18,24 +17,22 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
 byte myColor[MSG_LEN];
-//byte newColor[MSG_LEN];
 int value = 0;
 
 //led
-#define NUM_LEDS 9
+const int NUM_LEDS = 9;
 #define DATA_PIN D1
 #define GLOBAL_BRIGHTNESS 255
 
 //presence
 #define IN_PIN D2
-#define MIN_TIME 6000 //delay between new color
+const unsigned int MIN_TIME = 6000; //delay between new color
 volatile boolean newPresence = false;
 
 //random color
-byte COLOR_BITS = 5;
-unsigned long MAX_C = pow(2, COLOR_BITS); // number of variaitons per each color
-byte COLOR_MASK = MAX_C - 1;
-unsigned long MAX_NUM =  pow(MAX_C, 3);
+unsigned long MAX_C = 16; // number of variaitons per each color
+unsigned long MAX_CCC = MAX_C * MAX_C * MAX_C;
+unsigned long MAX_NUM = MAX_CCC;
 
 unsigned long rnd;
 unsigned long loops;
@@ -48,12 +45,10 @@ void setup() {
   Serial.begin(115200);
   Serial.println("");
   Serial.println("We Make Colors");
-  
+
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
   FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);
-  for (int i = 0; i < NUM_LEDS ; i++) {
-    leds[i] = CRGB(0, 0, 0);
-  }
+  memset(leds, 0, NUM_LEDS * 3);
   FastLED.show();
 
   pinMode(IN_PIN, INPUT);
@@ -100,9 +95,9 @@ void presence_isr() {
 void rnd_color() {
   unsigned long c = loops % MAX_NUM;
 
-  r = c      & COLOR_MASK; // red
-  g = c >> 4 & COLOR_MASK; //green
-  b = c >> 8 & COLOR_MASK; //blue
+  r = c    % MAX_C         ; // red
+  g = c / MAX_C  % MAX_C; //green
+  b = c / MAX_C  / MAX_C % MAX_C; //blue
 
   Serial.print ("spins ");
   Serial.println (loops / MAX_NUM);
@@ -154,7 +149,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     for (int i = 0; i < NUM_LEDS - 1; i++) {
       leds[i] = leds[i + 1];
     }
-    leds[NUM_LEDS - 1] = CRGB(calibrate(R), calibrate(G), calibrate (B));
+    leds[NUM_LEDS - 1] = CRGB(cal_lut(R), cal_lut(G), cal_lut (B));
     FastLED.show();
   }
 }
@@ -179,16 +174,10 @@ void reconnect() {
 }
 
 
-int calibrate( int rawVal) {
-  float gammaL = 2.5;
-  float inRange = MAX_C-1;
-  float outRangeL = 255;
-
-  float l;
-  float lC;
-
-  l = rawVal;
-  lC = pow((l / inRange), gammaL) * outRangeL;
-  return ((lC));
-
+byte cal_lut(byte c) {
+  if (c > 15) c = 15;
+  byte lut[16] = {0, 11, 14, 17, 21, 27, 34, 42, 53, 66, 83, 104, 130, 163, 204, 255};
+  return lut[c];
 }
+
+
