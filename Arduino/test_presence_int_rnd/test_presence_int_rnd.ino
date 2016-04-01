@@ -3,15 +3,14 @@
 //#define IN 7
 
 #define IN_PIN D2
-#define MIN_TIME 60000 //delay between new color
+#define MIN_TIME 6000 //delay between new color
 
 volatile boolean newPresence = false;
 
 //random color stuff
-byte COLOR_BITS = 5;
-unsigned long MAX_C = pow(2,COLOR_BITS); // number of variaitons per each color
-byte COLOR_MASK = MAX_C - 1;
-unsigned long MAX_NUM =  pow(MAX_C, 3);
+unsigned long MAX_C = 16; // number of variaitons per each color
+unsigned long MAX_CCC = MAX_C * MAX_C * MAX_C;
+unsigned long MAX_NUM = MAX_CCC;
 
 unsigned long rnd;
 unsigned long loops;
@@ -22,13 +21,9 @@ void setup() {
   pinMode(IN_PIN, INPUT);
   Serial.begin(115200);
   Serial.println("");
-  Serial.println("We Make Colors");
+  Serial.println("test presence");
   attachInterrupt(digitalPinToInterrupt(IN_PIN), presence_isr, RISING);
 
-  Serial.println(COLOR_BITS);
-  Serial.println(MAX_C);
-  Serial.println(COLOR_MASK);
-  Serial.println(MAX_NUM);
 }
 
 void loop() {
@@ -54,9 +49,9 @@ void presence_isr() {
 void rnd_color() {
   unsigned long c = loops % MAX_NUM;
 
-  r = c      & COLOR_MASK; // red
-  g = c >> 4 & COLOR_MASK; //green
-  b = c >> 8 & COLOR_MASK; //blue
+  r = c    % MAX_C         ; // red
+  g = c / MAX_C  % MAX_C; //green
+  b = c / MAX_C  / MAX_C % MAX_C; //blue
 
   Serial.print ("spins ");
   Serial.println (loops / MAX_NUM);

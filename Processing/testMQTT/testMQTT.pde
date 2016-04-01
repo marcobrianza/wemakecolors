@@ -95,7 +95,7 @@ void messageReceived(String topic, byte[] payload) {
 
 int cal_lut(int c){
   if (c>15) c=15;
-  int[] lut = {0, 11, 14, 17, 21, 27, 34, 42, 53, 66, 104, 130, 163, 204, 255};
+  int[] lut = {0, 11, 14, 17, 21, 27, 34, 42, 53, 66,83, 104, 130, 163, 204, 255};
 
   
   return lut[c];

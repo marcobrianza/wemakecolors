@@ -14,6 +14,9 @@ void setup() {
   FastLED.show();
 
   randomSeed(analogRead(A0));
+  Serial.begin(115200);
+  Serial.println();
+  Serial.print("test leds");
 }
 
 
@@ -33,7 +36,7 @@ void loop() {
   leds[NUM_LEDS - 1] = CRGB(R, G, B);
 
   FastLED.show();
-  delay(10000);
+  delay(5000);
 
 }
 

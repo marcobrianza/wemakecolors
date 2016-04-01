@@ -21,12 +21,13 @@ int value = 0;
 
 //led
 const int NUM_LEDS = 9;
-#define DATA_PIN D1
+#define LED_DATA_PIN D1
 #define GLOBAL_BRIGHTNESS 255
+#define LED_ORDER GRB //GRB=WS2812B  BRG=TM1809
 
 //presence
 #define IN_PIN D2
-const unsigned int MIN_TIME = 6000; //delay between new color
+const unsigned int MIN_TIME = 60000; //delay between new color
 volatile boolean newPresence = false;
 
 //random color
@@ -43,11 +44,12 @@ CRGB leds[NUM_LEDS];
 
 void setup() {
   Serial.begin(115200);
+  delay(600);
   Serial.println("");
   Serial.println("We Make Colors");
 
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
-  FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, LED_DATA_PIN, LED_ORDER>(leds, NUM_LEDS);
   memset(leds, 0, NUM_LEDS * 3);
   FastLED.show();
 

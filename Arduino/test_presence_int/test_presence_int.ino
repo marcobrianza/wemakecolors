@@ -1,7 +1,5 @@
 
 
-//#define IN 7
-
 #define IN_PIN D2
 #define MIN_TIME 6000 //delay between new color
 
@@ -13,7 +11,8 @@ void setup() {
   pinMode(IN_PIN, INPUT);
   Serial.begin(115200);
   Serial.println("");
-  Serial.println("We Make Colors");
+  Serial.println("test presence int");
+  delay (1000);
   attachInterrupt(digitalPinToInterrupt(IN_PIN), presence_isr, RISING);
 
 }
