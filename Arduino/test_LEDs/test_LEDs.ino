@@ -1,3 +1,8 @@
+// test software for We Make Colors
+// Marco Brianza - April 9th 2016
+//
+// test LEDs
+
 #include "FastLED.h"
 
 #define NUM_LEDS 9
@@ -8,15 +13,19 @@
 CRGB leds[NUM_LEDS];
 
 void setup() {
+Serial.begin(115200);
+delay(600);
+Serial.println("");
+Serial.println("test LEDs");
+delay (2000);
+  
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   memset(leds, 0, NUM_LEDS * 3);
   FastLED.show();
 
   randomSeed(analogRead(A0));
-  Serial.begin(115200);
-  Serial.println();
-  Serial.print("test leds");
+  
 }
 
 
@@ -36,7 +45,7 @@ void loop() {
   leds[NUM_LEDS - 1] = CRGB(R, G, B);
 
   FastLED.show();
-  delay(5000);
+  delay(6000);
 
 }
 

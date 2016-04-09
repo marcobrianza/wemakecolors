@@ -1,4 +1,4 @@
-// This example sketch connects to shiftr.io
+ // This example sketch connects to shiftr.io
 // and sends a message on every mouse clic.
 //
 // After starting the sketch you can find the

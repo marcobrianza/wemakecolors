@@ -1,6 +1,7 @@
-
-
-//#define IN 7
+// test software for We Make Colors
+// Marco Brianza - April 9th 2016
+//
+// test presence and rnd
 
 #define IN_PIN D2
 #define MIN_TIME 6000 //delay between new color
@@ -19,9 +20,12 @@ byte r, g, b;
 void setup() {
   // put your setup code here, to run once:
   pinMode(IN_PIN, INPUT);
+  
   Serial.begin(115200);
+  delay(600);
   Serial.println("");
-  Serial.println("test presence");
+  Serial.println("test presence and rnd");
+  
   attachInterrupt(digitalPinToInterrupt(IN_PIN), presence_isr, RISING);
 
 }

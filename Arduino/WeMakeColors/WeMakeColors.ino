@@ -36,7 +36,7 @@ unsigned long MAX_CCC = MAX_C * MAX_C * MAX_C;
 unsigned long MAX_NUM = MAX_CCC;
 
 unsigned long rnd;
-unsigned long loops;
+unsigned long countLoops;
 byte r, g, b; //localy generated color
 byte R, G, B; //color rrived from remote
 
@@ -64,25 +64,31 @@ void setup() {
 
 
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
+  if (!client.connected())  reconnect();
   client.loop();
-  loops++;
+  
+  countLoops++;
 
   if (newPresence) {
     newPresence = false;
     Serial.print("sec ");
     Serial.println(millis() / 1000);
     rnd_color();
-    myColor[0] = r;
-    myColor[1] = g;
-    myColor[2] = b;
-
+    myColor[0] = r;  myColor[1] = g;  myColor[2] = b;
     client.publish(MQTT_TOPIC, myColor, 3);
   }
 }
 
+void rnd_color() {
+  unsigned long c = countLoops % MAX_NUM;
+
+  r = c    % MAX_C;               // red
+  g = c / MAX_C  % MAX_C;         //green
+  b = c / MAX_C  / MAX_C % MAX_C; //blue
+
+  Serial.print ("countLoops ");   Serial.println (countLoops / MAX_NUM);
+  Serial.println("rgb ");   Serial.println(r);   Serial.println(g);   Serial.println(b); 
+}
 
 
 void presence_isr() {
@@ -94,23 +100,6 @@ void presence_isr() {
 }
 
 
-void rnd_color() {
-  unsigned long c = loops % MAX_NUM;
-
-  r = c    % MAX_C         ; // red
-  g = c / MAX_C  % MAX_C; //green
-  b = c / MAX_C  / MAX_C % MAX_C; //blue
-
-  Serial.print ("spins ");
-  Serial.println (loops / MAX_NUM);
-
-  Serial.println("rgb ");
-  Serial.println(r);
-  Serial.println(g);
-  Serial.println(b);
-  Serial.println("");
-
-}
 
 void setup_wifi() {
 
