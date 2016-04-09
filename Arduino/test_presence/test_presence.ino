@@ -3,13 +3,11 @@
 //
 // test presence polling
 
-
-#define LED 16
 #define IN D2
 
 void setup() {
 pinMode(IN, INPUT);
-pinMode(LED,OUTPUT);
+pinMode(LED_BUILTIN,OUTPUT);
 
 Serial.begin(115200);
 delay(600);
@@ -22,7 +20,7 @@ delay (2000);
 void loop() {
 int p=digitalRead(IN);
 
-digitalWrite(LED,p);
+digitalWrite(LED_BUILTIN,!p); //LED is active LOW
 Serial.println(p); 
 delay(100);
 

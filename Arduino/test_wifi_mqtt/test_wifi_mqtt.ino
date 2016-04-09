@@ -24,6 +24,12 @@
 
 */
 
+// test software for We Make Colors
+// Marco Brianza - April 9th 2016
+//
+// test WiFi MQTT
+
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
@@ -35,7 +41,7 @@ const char* PASSWORD = "...";
 const char* MQTT_SERVER = "net.marcobrianza.it";
 //const char* MQTT_SERVER = "192.168.1.128";
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
-const char* MQTT_ID = "ColorArduino";
+const char* MQTT_ID = "ColorArduinoxx";
 
 const byte MSG_LEN = 3;
 
@@ -49,7 +55,12 @@ int value = 0;
 
 
 void setup() {
-  Serial.begin(115200);
+Serial.begin(115200);
+delay(600);
+Serial.println("");
+Serial.println("test WiFi MQTT");
+delay (2000);
+
   setup_wifi();
   client.setServer(MQTT_SERVER, 1883);
   client.setCallback(callback);
