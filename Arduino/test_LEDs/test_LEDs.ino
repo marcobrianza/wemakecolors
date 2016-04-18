@@ -4,9 +4,11 @@
 // test LEDs
 
 #include "FastLED.h"
+//#define FASTLED_ALLOW_INTERRUPTS 0
+//#define FASTLED_ESP8266_RAW_PIN_ORDER
 
 #define NUM_LEDS 9
-#define DATA_PIN D1
+#define DATA_PIN 1 //it was D1 with previous lib version
 #define GLOBAL_BRIGHTNESS 255
 #define MAX_C 16
 
@@ -21,6 +23,7 @@ delay (2000);
   
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  //delay(1000);
   memset(leds, 0, NUM_LEDS * 3);
   FastLED.show();
 
@@ -45,8 +48,9 @@ void loop() {
   leds[NUM_LEDS - 1] = CRGB(R, G, B);
 
   FastLED.show();
+  Serial.print(R); Serial.print(" "); Serial.print(G); Serial.print(" "); Serial.println(G);
+  
   delay(6000);
-
 }
 
 byte cal_lut(byte c) {
