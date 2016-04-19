@@ -2,26 +2,27 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-// Update these with values suitable for your network.
-//const char* SSID = "...";
-//const char* PASSWORD = "...";
-#include "config.h"
+// Update these with values suitable for your network and device.
+ const char* SSID = "...";
+ const char* PASSWORD = "...";
+ const char* MQTT_ID = "MyID";
 
 
 const char* MQTT_SERVER = "net.marcobrianza.it";
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
-const char* MQTT_ID = "ColorArduino";
+
 const byte MSG_LEN = 3;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
 long lastMsg = 0;
 byte myColor[MSG_LEN];
 int value = 0;
 
-//led
+//LEDs
 const int NUM_LEDS = 9;
-#define LED_DATA_PIN D1
+#define LED_DATA_PIN 1 //before it was D1
 #define GLOBAL_BRIGHTNESS 255
 #define LED_ORDER GRB //GRB=WS2812B  BRG=TM1809
 
@@ -71,8 +72,7 @@ void loop() {
 
   if (newPresence) {
     newPresence = false;
-    Serial.print("sec ");
-    Serial.println(millis() / 1000);
+    Serial.print("sec "); Serial.println(millis() / 1000);
     rnd_color();
     myColor[0] = r;  myColor[1] = g;  myColor[2] = b;
     client.publish(MQTT_TOPIC, myColor, 3);
@@ -87,7 +87,7 @@ void rnd_color() {
   b = c / MAX_C  / MAX_C % MAX_C; //blue
 
   Serial.print ("countLoops ");   Serial.println (countLoops / MAX_NUM);
-  Serial.println("rgb ");   Serial.println(r);   Serial.println(g);   Serial.println(b); 
+  Serial.print("rgb ");   Serial.print(r); Serial.print(" ");   Serial.println(g); Serial.print(" ");  Serial.println(b); 
 }
 
 
