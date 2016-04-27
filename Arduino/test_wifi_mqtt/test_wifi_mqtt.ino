@@ -29,41 +29,42 @@
 //
 // test WiFi MQTT
 
-
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#endif
+
+#if defined(ARDUINO_SAMD_MKR1000)
+#include <WiFi101.h>
+#endif
+
 #include <PubSubClient.h>
 
 // Update these with values suitable for your network.
-const char* SSID = "...";
-const char* PASSWORD = "...";
+//const char* SSID = "...";
+//const char* PASSWORD = "...";
+const char* MQTT_ID = "ColorArduinoXXX";
 
-//const char* MQTT_SERVER = "test.mosquitto.org";
-const char* MQTT_SERVER = "net.marcobrianza.it";
-//const char* MQTT_SERVER = "192.168.1.128";
+const char* MQTT_SERVER = "test.mosquitto.org";
+const int MQTT_PORT = 1883;
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
-const char* MQTT_ID = "ColorArduinoxx";
 
 const byte MSG_LEN = 3;
 
-WiFiClient espClient;
-PubSubClient client(espClient);
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
 long lastMsg = 0;
 byte myColor[MSG_LEN];
 byte newColor[MSG_LEN];
 int value = 0;
 
-
-
 void setup() {
 Serial.begin(115200);
-delay(600);
-Serial.println("");
-Serial.println("test WiFi MQTT");
-delay (2000);
+delay(2000);
+Serial.println("\n test WiFi MQTT");
 
   setup_wifi();
-  client.setServer(MQTT_SERVER, 1883);
-  client.setCallback(callback);
+  mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
+  mqttClient.setCallback(callback);
 
   //test color = teal
   myColor[0] = 1;
@@ -75,10 +76,7 @@ void setup_wifi() {
 
   delay(10);
   // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(SSID);
-
+  Serial.print("Connecting to "); Serial.println(SSID);
   WiFi.begin(SSID, PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -86,10 +84,10 @@ void setup_wifi() {
     Serial.print(".");
   }
 
-  Serial.println("");
+  IPAddress ip = WiFi.localIP();
   Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.print("IP address: ");
+  Serial.println(ip);
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -113,16 +111,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void reconnect() {
   // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+  while (!mqttClient.connected()) {
+    Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(MQTT_ID)) {
-      Serial.println("connected");
+    if (mqttClient.connect(MQTT_ID)) {
+      Serial.println("connected\n");
       // ... and resubscribe
-      client.subscribe(MQTT_TOPIC);
+      mqttClient.subscribe(MQTT_TOPIC);
     } else {
       Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print(mqttClient.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
@@ -131,13 +129,13 @@ void reconnect() {
 }
 void loop() {
 
-  if (!client.connected()) {
+  if (!mqttClient.connected()) {
     reconnect();
   }
-  client.loop();
+  mqttClient.loop();
 
   long now = millis();
-  if (now - lastMsg > 2000) {
+  if (now - lastMsg > 5000) {
     lastMsg = now;
 
     Serial.print("Publish message: ");
@@ -146,6 +144,6 @@ void loop() {
       Serial.print(" ");
     }
     Serial.println();
-    client.publish(MQTT_TOPIC, myColor, 3);
+    mqttClient.publish(MQTT_TOPIC, myColor, 3);
   }
 }

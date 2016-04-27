@@ -1,20 +1,33 @@
-#include "FastLED.h"
+
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#define IN_PIN D2
+#define LED_DATA_PIN 1
+#endif
+
+#if defined(ARDUINO_SAMD_MKR1000)
+#include <WiFi101.h>
+#define IN_PIN 4
+#define LED_DATA_PIN 5
+#endif
+
 #include <PubSubClient.h>
+#include "FastLED.h"
 
 // Update these with values suitable for your network and device.
- const char* SSID = "...";
- const char* PASSWORD = "...";
- const char* MQTT_ID = "MyID";
+//const char* SSID = "...";
+//const char* PASSWORD = "...";
+const char* MQTT_ID = "Marcos101";
 
 
 const char* MQTT_SERVER = "net.marcobrianza.it";
+const int MQTT_PORT = 1883;
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
 
 const byte MSG_LEN = 3;
 
-WiFiClient espClient;
-PubSubClient client(espClient);
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
 
 long lastMsg = 0;
 byte myColor[MSG_LEN];
@@ -22,12 +35,11 @@ int value = 0;
 
 //LEDs
 const int NUM_LEDS = 9;
-#define LED_DATA_PIN 1 //before it was D1
 #define GLOBAL_BRIGHTNESS 255
 #define LED_ORDER GRB //GRB=WS2812B  BRG=TM1809
 
 //presence
-#define IN_PIN D2
+//#define IN_PIN D2 //defined in core selection
 const unsigned int MIN_TIME = 60000; //delay between new color
 volatile boolean newPresence = false;
 
@@ -45,9 +57,8 @@ CRGB leds[NUM_LEDS];
 
 void setup() {
   Serial.begin(115200);
-  delay(600);
-  Serial.println("");
-  Serial.println("We Make Colors");
+  delay(2000);
+  Serial.println("\n We Make Colors");
 
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
   FastLED.addLeds<WS2812B, LED_DATA_PIN, LED_ORDER>(leds, NUM_LEDS);
@@ -55,19 +66,29 @@ void setup() {
   FastLED.show();
 
   pinMode(IN_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(IN_PIN), presence_isr, RISING);
+  int i;
+
+#if defined(ESP8266)
+  i = digitalPinToInterrupt(IN_PIN);
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD)
+  i = IN_PIN;
+#endif
+
+  attachInterrupt(i, presence_isr, RISING);
 
   setup_wifi();
-  client.setServer(MQTT_SERVER, 1883);
-  client.setCallback(callback);
+  mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
+  mqttClient.setCallback(callback);
 }
 
 
 
 void loop() {
-  if (!client.connected())  reconnect();
-  client.loop();
-  
+  if (!mqttClient.connected())  reconnect();
+  mqttClient.loop();
+
   countLoops++;
 
   if (newPresence) {
@@ -75,7 +96,7 @@ void loop() {
     Serial.print("sec "); Serial.println(millis() / 1000);
     rnd_color();
     myColor[0] = r;  myColor[1] = g;  myColor[2] = b;
-    client.publish(MQTT_TOPIC, myColor, 3);
+    mqttClient.publish(MQTT_TOPIC, myColor, 3);
   }
 }
 
@@ -87,7 +108,7 @@ void rnd_color() {
   b = c / MAX_C  / MAX_C % MAX_C; //blue
 
   Serial.print ("countLoops ");   Serial.println (countLoops / MAX_NUM);
-  Serial.print("rgb ");   Serial.print(r); Serial.print(" ");   Serial.println(g); Serial.print(" ");  Serial.println(b); 
+  Serial.print("rgb ");   Serial.print(r); Serial.print(" ");   Serial.print(g); Serial.print(" ");  Serial.println(b);
 }
 
 
@@ -105,10 +126,7 @@ void setup_wifi() {
 
   delay(10);
   // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(SSID);
-
+  Serial.print("\nConnecting to "); Serial.println(SSID);
   WiFi.begin(SSID, PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -116,10 +134,10 @@ void setup_wifi() {
     Serial.print(".");
   }
 
-  Serial.println("");
+  IPAddress ip = WiFi.localIP();
   Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.print("IP address: ");
+  Serial.println(ip);
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -147,16 +165,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void reconnect() {
   // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+  while (!mqttClient.connected()) {
+    Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(MQTT_ID)) {
-      Serial.println("connected");
+    if (mqttClient.connect(MQTT_ID)) {
+      Serial.println("connected\n");
       // ... and resubscribe
-      client.subscribe(MQTT_TOPIC);
+      mqttClient.subscribe(MQTT_TOPIC);
     } else {
       Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print(mqttClient.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);

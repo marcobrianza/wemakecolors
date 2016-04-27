@@ -4,31 +4,34 @@
 // test LEDs
 
 #include "FastLED.h"
+
+#if defined(ESP8266)
+#define LED_DATA_PIN 1 //it was D1 with previous lib version
 //#define FASTLED_ALLOW_INTERRUPTS 0
-//#define FASTLED_ESP8266_RAW_PIN_ORDER
+#endif
+
+#if defined(ARDUINO_SAMD_MKR1000)
+#define LED_DATA_PIN 5
+#endif
+
 
 #define NUM_LEDS 9
-#define DATA_PIN 1 //it was D1 with previous lib version
 #define GLOBAL_BRIGHTNESS 255
 #define MAX_C 16
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
-Serial.begin(115200);
-delay(600);
-Serial.println("");
-Serial.println("test LEDs");
-delay (2000);
-  
+  Serial.begin(115200);
+  delay(2000);
+  Serial.println("\n test LEDs");
+
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
-  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  //delay(1000);
+  FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
   memset(leds, 0, NUM_LEDS * 3);
   FastLED.show();
 
   randomSeed(analogRead(A0));
-  
 }
 
 
@@ -49,7 +52,7 @@ void loop() {
 
   FastLED.show();
   Serial.print(R); Serial.print(" "); Serial.print(G); Serial.print(" "); Serial.println(G);
-  
+
   delay(6000);
 }
 

@@ -3,7 +3,15 @@
 //
 // test presence and rnd
 
+
+#if defined(ESP8266)
 #define IN_PIN D2
+#endif
+
+#if defined(ARDUINO_SAMD_MKR1000)
+#define IN_PIN 4
+#endif
+
 #define MIN_TIME 6000 //delay between new color
 
 volatile boolean newPresence = false;
@@ -18,15 +26,23 @@ unsigned long loops;
 byte r, g, b;
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(IN_PIN, INPUT);
-  
   Serial.begin(115200);
-  delay(600);
-  Serial.println("");
-  Serial.println("test presence and rnd");
-  
-  attachInterrupt(digitalPinToInterrupt(IN_PIN), presence_isr, RISING);
+  delay(2000);
+  Serial.println("\n test presence and rnd");
+
+  pinMode(IN_PIN, INPUT);
+
+  int i;
+
+#if defined(ESP8266)
+  i = digitalPinToInterrupt(IN_PIN);
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD)
+  i = IN_PIN;
+#endif
+
+  attachInterrupt(i, presence_isr, RISING);
 
 }
 
