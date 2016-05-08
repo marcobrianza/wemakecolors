@@ -42,11 +42,15 @@
 // Update these with values suitable for your network.
 //const char* SSID = "...";
 //const char* PASSWORD = "...";
-const char* MQTT_ID = "ColorArduinoXXX";
 
-const char* MQTT_SERVER = "test.mosquitto.org";
+
+char* MQTT_ID = "WMC_11:22:33:44:55:66"; // MQTT_ID (will be changed automatically on ESP8266)
+
+const char* MQTT_SERVER = "net.marcobrianza.it";
+//const char* MQTT_SERVER = "test.mosquitto.org";
+
 const int MQTT_PORT = 1883;
-const char* MQTT_TOPIC =   "/WeMakeColors/color";
+const char* MQTT_TOPIC =   "/WeMakeColors/color_test";
 
 const byte MSG_LEN = 3;
 
@@ -58,13 +62,37 @@ byte newColor[MSG_LEN];
 int value = 0;
 
 void setup() {
-Serial.begin(115200);
-delay(2000);
-Serial.println("\n test WiFi MQTT");
+  Serial.begin(115200);
+  delay(2000);
+  Serial.println("\n test WiFi MQTT");
 
   setup_wifi();
+
+  byte ma[6];
+  WiFi.macAddress(ma);
+
+  //  Serial.print("MAC: ");
+  //  Serial.print(ma[0], HEX);
+  //  Serial.print(":");
+  //  Serial.print(ma[1], HEX);
+  //  Serial.print(":");
+  //  Serial.print(ma[2], HEX);
+  //  Serial.print(":");
+  //  Serial.print(ma[3], HEX);
+  //  Serial.print(":");
+  //  Serial.print(ma[4], HEX);
+  //  Serial.print(":");
+  //  Serial.println(ma[5], HEX);
+#if defined(ESP8266)
+  sprintf(MQTT_ID, "WMC_%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
+#endif
+
+  Serial.print("MQTT_ID: ");
+  Serial.println(MQTT_ID);
+
+
   mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
-  mqttClient.setCallback(callback);
+  mqttClient.setCallback(mqtt_callback);
 
   //test color = teal
   myColor[0] = 1;
@@ -90,7 +118,7 @@ void setup_wifi() {
   Serial.println(ip);
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");

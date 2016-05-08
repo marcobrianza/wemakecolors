@@ -15,10 +15,10 @@
 #include "FastLED.h"
 
 // Update these with values suitable for your network and device.
-//const char* SSID = "...";
-//const char* PASSWORD = "...";
-const char* MQTT_ID = "Marcos101";
+const char* SSID = "...";
+const char* PASSWORD = "...";
 
+char* MQTT_ID = "WMC_11:22:33:44:55:66"; // MQTT_ID (will be changed automatically on ESP8266)
 
 const char* MQTT_SERVER = "net.marcobrianza.it";
 const int MQTT_PORT = 1883;
@@ -79,8 +79,19 @@ void setup() {
   attachInterrupt(i, presence_isr, RISING);
 
   setup_wifi();
+
+  byte ma[6];
+  WiFi.macAddress(ma);
+
+#if defined(ESP8266)
+  sprintf(MQTT_ID, "WMC_%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
+#endif
+
+  Serial.print("MQTT_ID: ");
+  Serial.println(MQTT_ID);
+
   mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
-  mqttClient.setCallback(callback);
+  mqttClient.setCallback(mqtt_callback);
 }
 
 
@@ -140,7 +151,7 @@ void setup_wifi() {
   Serial.println(ip);
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
