@@ -66,8 +66,9 @@ void setup() {
   FastLED.show();
 
   pinMode(IN_PIN, INPUT);
+  pinMode(LED_BUILTIN,OUTPUT);
+  
   int i;
-
 #if defined(ESP8266)
   i = digitalPinToInterrupt(IN_PIN);
 #endif
@@ -140,10 +141,15 @@ void setup_wifi() {
   Serial.print("\nConnecting to "); Serial.println(SSID);
   WiFi.begin(SSID, PASSWORD);
 
+ boolean led=false;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+    digitalWrite(LED_BUILTIN,led);
+    led=!led;
   }
+  digitalWrite(LED_BUILTIN,HIGH);
+  
 
   IPAddress ip = WiFi.localIP();
   Serial.println("WiFi connected");
@@ -177,9 +183,11 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
+    digitalWrite(LED_BUILTIN,LOW);
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
     if (mqttClient.connect(MQTT_ID)) {
+      digitalWrite(LED_BUILTIN,HIGH);
       Serial.println("connected\n");
       // ... and resubscribe
       mqttClient.subscribe(MQTT_TOPIC);
