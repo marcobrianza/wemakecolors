@@ -1,9 +1,10 @@
 Layer to slice for Laser
 
 BIG Laser Settings
-Cut: power speed=15, power 100%
-Cut-line: speed 200, power 20%
 Engrave: speed 80, per 100%
+Cut-line: speed 100, power 20%
+Cut: power speed=15, power 100%
+
 
 
 Color Laser process oder / function
@@ -14,46 +15,94 @@ MAGENTA=Cut
 BLACK=Cut
 
 
-0 - diffuser (1mm white plexi)
+9 - diffuser (1mm white plexi)
 PIR
 Border
 
 
-1 - engrave
+8 - engrave
 engrave screws
 screws border
-screws PCB
 grid LED
 grid PCB
 border
+txt 08
 
 
-2,3,4,5 - engrave
+7,6,5 - border
 screws border
-screws PCB
 grid LED
 grid PCB
 border
+txt 05
+txt 06
+txt 07
 
-6 - ex
+4 - ex
 screws border
 grid LED
 grid PCB EX
 border
+txt 04
 
-7 - cuts
+
+
+3a - ex amica
+screws border
+grid LED
+grid PCB EX
+border
+txt 03
+txt amica
+
+3m - ex mkr1000
+screws border
+grid LED
+grid PCB EX
+USB opening
+border
+txt 03
+txt mkr1000
+
+
+2a - cuts amica
 screws border
 strip_cuts
 USB opening
 grid LED
 grid PCB EX
 border
+txt 02
+txt amica
 
-8 - bottom
+2m - cuts mkr1000
 screws border
-screws PCB
+strip_cuts
+grid LED
+grid PCB EX
+border
+txt 02
+txt mkr1000
+
+1a - bottom amica
+screws border
+fixing_amica
 screws-PIR
 LED Strip 10
 LED Strip 12
 border
+txt 01
+txt amica
+txt logo
+
+1m - bottom mkr1000
+screws border
+fixing_mkr1000
+screws-PIR
+LED Strip 10
+LED Strip 12
+border
+txt 01
+txt mkr1000
+txt logo
 
