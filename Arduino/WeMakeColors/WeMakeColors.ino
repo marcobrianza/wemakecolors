@@ -50,15 +50,15 @@ unsigned long MAX_NUM = MAX_CCC;
 
 unsigned long rnd;
 unsigned long countLoops;
-byte r, g, b; //localy generated color
-byte R, G, B; //color rrived from remote
+byte r, g, b; //locally generated color
+byte R, G, B; //color received from remote
 
 CRGB leds[NUM_LEDS];
 
 void setup() {
   Serial.begin(115200);
   delay(2000);
-  Serial.println("\n We Make Colors");
+  Serial.println("\n WeMakeColors");
 
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
   FastLED.addLeds<WS2812B, LED_DATA_PIN, LED_ORDER>(leds, NUM_LEDS);
@@ -125,7 +125,7 @@ void rnd_color() {
 
 
 void presence_isr() {
-  static unsigned long lastMillis = 0;
+  static unsigned long lastMillis = MIN_TIME+1; // this initialization enables to generate a new color at startup
   if (abs(millis() - lastMillis) > MIN_TIME) {
     newPresence = true;
     lastMillis = millis();
@@ -138,7 +138,7 @@ void setup_wifi() {
 
   delay(10);
   // We start by connecting to a WiFi network
-  Serial.print("\nConnecting to "); Serial.println(SSID);
+  Serial.print("\nConnecting to network: "); Serial.println(SSID);
   WiFi.begin(SSID, PASSWORD);
 
  boolean led=false;
