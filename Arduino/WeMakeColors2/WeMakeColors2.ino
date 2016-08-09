@@ -3,13 +3,15 @@
 #include <ESP8266WiFi.h>
 #define IN_PIN D2
 #define LED_DATA_PIN 1
+#define CONFIG_PIN 0  //set to GND at startup to force config using builtin button
+
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
 
 #include <PubSubClient.h>
 #include "FastLED.h"
 
-// Update these with values suitable for your network and device.
-const char* SSID = "...";
-const char* PASSWORD = "...";
 
 char* THING_ID = "WeMakeColors-11:22:33:44:55:66"; // THING_ID (will be changed automatically on ESP8266)
 
@@ -25,6 +27,8 @@ PubSubClient mqttClient(wifiClient);
 long lastMsg = 0;
 byte myColor[MSG_LEN];
 int value = 0;
+
+boolean led=LOW;
 
 //LEDs
 const int NUM_LEDS = 9;
@@ -60,12 +64,11 @@ void setup() {
 
   pinMode(IN_PIN, INPUT);
   pinMode(LED_BUILTIN,OUTPUT);
+  pinMode(CONFIG_PIN, INPUT_PULLUP);
   
 
   int i = digitalPinToInterrupt(IN_PIN);
   attachInterrupt(i, presence_isr, RISING);
-
-  connect_wifi();
 
   byte ma[6];
   WiFi.macAddress(ma);
@@ -74,6 +77,8 @@ void setup() {
 
   Serial.print("THING_ID: ");
   Serial.println(THING_ID);
+
+  connect_wifi_or_AP(false);
 
   mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
   mqttClient.setCallback(mqtt_callback);
@@ -117,29 +122,43 @@ void presence_isr() {
 }
 
 
+void connect_wifi_or_AP(bool force_config) {
+  digitalWrite(LED_BUILTIN, LOW);
 
-void connect_wifi() {
+//  WiFi.disconnect();
+//  delay(100);
 
-  WiFi.disconnect();
-  delay(100);
-  Serial.print("\nConnecting to network: "); Serial.println(SSID);
-  WiFi.begin(SSID, PASSWORD);
+  WiFiManager wifiManager;
+  wifiManager.setDebugOutput(true);
+  wifiManager.setAPStaticIPConfig(IPAddress(1, 1, 1, 1), IPAddress(1, 1, 1, 1), IPAddress(255, 255, 255, 0));
 
- boolean led=false;
+  if ((digitalRead(CONFIG_PIN) == LOW) || (force_config == true)) { //config must be done
+    wifiManager.setConfigPortalTimeout(0);
+    //wifiManager.resetSettings(); //reset saved settings
+    wifiManager.startConfigPortal(THING_ID);
+  } else
+  {
+    wifiManager.setConfigPortalTimeout(60);
+    wifiManager.autoConnect(THING_ID);
+  }
+
+  boolean led = false;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-    digitalWrite(LED_BUILTIN,led);
-    led=!led;
+    digitalWrite(LED_BUILTIN, led);
+    led = !led;
   }
-  digitalWrite(LED_BUILTIN,HIGH);
-  
 
-  IPAddress ip = WiFi.localIP();
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(ip);
+  //if you get here you have connected to the WiFi
+  Serial.print("connected to network ");
+  Serial.println(WiFi.SSID());
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  WiFi.mode(WIFI_STA);
+
 }
+
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
