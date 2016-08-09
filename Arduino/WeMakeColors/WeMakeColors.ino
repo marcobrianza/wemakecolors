@@ -1,15 +1,22 @@
 
-
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #define IN_PIN D2
 #define LED_DATA_PIN 1
+#endif
+
+#if defined(ARDUINO_SAMD_MKR1000)
+#include <WiFi101.h>
+#define IN_PIN 4
+#define LED_DATA_PIN 5
+#endif
 
 #include <PubSubClient.h>
 #include "FastLED.h"
 
 // Update these with values suitable for your network and device.
-const char* SSID = "sonny";
-const char* PASSWORD = "youyouyou";
+const char* SSID = "...";
+const char* PASSWORD = "...";
 
 char* THING_ID = "WeMakeColors-11:22:33:44:55:66"; // THING_ID (will be changed automatically on ESP8266)
 
@@ -61,8 +68,15 @@ void setup() {
   pinMode(IN_PIN, INPUT);
   pinMode(LED_BUILTIN,OUTPUT);
   
+  int i;
+#if defined(ESP8266)
+  i = digitalPinToInterrupt(IN_PIN);
+#endif
 
-  int i = digitalPinToInterrupt(IN_PIN);
+#if defined(ARDUINO_ARCH_SAMD)
+  i = IN_PIN;
+#endif
+
   attachInterrupt(i, presence_isr, RISING);
 
   connect_wifi();
@@ -70,8 +84,9 @@ void setup() {
   byte ma[6];
   WiFi.macAddress(ma);
 
+#if defined(ESP8266)
   sprintf(THING_ID, "WeMakeColors-%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
-
+#endif
 
   Serial.print("THING_ID: ");
   Serial.println(THING_ID);
