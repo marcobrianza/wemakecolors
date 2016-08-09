@@ -9,9 +9,13 @@
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
 
+#include <ESP8266mDNS.h>
+#include <ArduinoOTA.h>
+
 #include <PubSubClient.h>
 #include "FastLED.h"
 
+const char* OTA_PASSWORD = "12345678";
 
 char* THING_ID = "WeMakeColors-11:22:33:44:55:66"; // THING_ID (will be changed automatically on ESP8266)
 
@@ -82,6 +86,8 @@ void setup() {
 
   mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
   mqttClient.setCallback(mqtt_callback);
+
+  setupOTA();
 }
 
 
@@ -99,6 +105,8 @@ void loop() {
     myColor[0] = r;  myColor[1] = g;  myColor[2] = b;
     mqttClient.publish(MQTT_TOPIC, myColor, 3);
   }
+
+  ArduinoOTA.handle();
 }
 
 void rnd_color() {
@@ -209,6 +217,34 @@ byte cal_lut(byte c) {
   if (c > 15) c = 15;
   byte lut[16] = {0, 11, 14, 17, 21, 27, 34, 42, 53, 66, 83, 104, 130, 163, 204, 255};
   return lut[c];
+}
+
+void setupOTA() {
+
+  ArduinoOTA.setPort(8266); // Port defaults to 8266
+  ArduinoOTA.setHostname(THING_ID);   // Hostname defaults to esp8266-[ChipID]
+  ArduinoOTA.setPassword((const char *) OTA_PASSWORD);   // No authentication by default
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("\nStart OTA");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd OTA");
+    delay(100);
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+  Serial.println("OTA Ready");
 }
 
 
