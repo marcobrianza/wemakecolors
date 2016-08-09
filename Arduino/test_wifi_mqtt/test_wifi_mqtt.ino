@@ -40,8 +40,8 @@
 #include <PubSubClient.h>
 
 // Update these with values suitable for your network.
-//const char* SSID = "...";
-//const char* PASSWORD = "...";
+const char* SSID = "...";
+const char* PASSWORD = "...";
 
 
 char* MQTT_ID = "WMC_11:22:33:44:55:66"; // MQTT_ID (will be changed automatically on ESP8266)
@@ -66,7 +66,7 @@ void setup() {
   delay(2000);
   Serial.println("\n test WiFi MQTT");
 
-  setup_wifi();
+  connect_wifi();
 
   byte ma[6];
   WiFi.macAddress(ma);
@@ -100,9 +100,9 @@ void setup() {
   myColor[2] = 12;
 }
 
-void setup_wifi() {
-
-  delay(10);
+void connect_wifi() {
+ WiFi.disconnect();
+  delay(100);
   // We start by connecting to a WiFi network
   Serial.print("Connecting to "); Serial.println(SSID);
   WiFi.begin(SSID, PASSWORD);

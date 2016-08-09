@@ -1,9 +1,15 @@
 
-// Version 1.2 esp8266 only
-
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #define IN_PIN D2
 #define LED_DATA_PIN 1
+#endif
+
+#if defined(ARDUINO_SAMD_MKR1000)
+#include <WiFi101.h>
+#define IN_PIN 4
+#define LED_DATA_PIN 5
+#endif
 
 #include <PubSubClient.h>
 #include "FastLED.h"
@@ -12,8 +18,7 @@
 const char* SSID = "...";
 const char* PASSWORD = "...";
 
-
-char* MQTT_ID = "WMC_11:22:33:44:55:66"; // MQTT_ID (will be changed automatically on ESP8266)
+char* THING_ID = "WeMakeColors-11:22:33:44:55:66"; // THING_ID (will be changed automatically on ESP8266)
 
 const char* MQTT_SERVER = "net.marcobrianza.it";
 const int MQTT_PORT = 1883;
@@ -64,20 +69,27 @@ void setup() {
   pinMode(LED_BUILTIN,OUTPUT);
   
   int i;
-
+#if defined(ESP8266)
   i = digitalPinToInterrupt(IN_PIN);
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD)
+  i = IN_PIN;
+#endif
 
   attachInterrupt(i, presence_isr, RISING);
 
-  setup_wifi();
+  connect_wifi();
 
   byte ma[6];
   WiFi.macAddress(ma);
 
-  sprintf(MQTT_ID, "WMC_%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
+#if defined(ESP8266)
+  sprintf(THING_ID, "WeMakeColors-%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
+#endif
 
-  Serial.print("MQTT_ID: ");
-  Serial.println(MQTT_ID);
+  Serial.print("THING_ID: ");
+  Serial.println(THING_ID);
 
   mqttClient.setServer(MQTT_SERVER, MQTT_PORT);
   mqttClient.setCallback(mqtt_callback);
@@ -86,7 +98,7 @@ void setup() {
 
 
 void loop() {
-  if (!mqttClient.connected())  reconnect();
+  if (!mqttClient.connected())  reconnectMQTT();
   mqttClient.loop();
 
   countLoops++;
@@ -122,10 +134,10 @@ void presence_isr() {
 
 
 
-void setup_wifi() {
+void connect_wifi() {
 
-  delay(10);
-  // We start by connecting to a WiFi network
+  WiFi.disconnect();
+  delay(100);
   Serial.print("\nConnecting to network: "); Serial.println(SSID);
   WiFi.begin(SSID, PASSWORD);
 
@@ -168,13 +180,13 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-void reconnect() {
+void reconnectMQTT() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
     digitalWrite(LED_BUILTIN,LOW);
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
-    if (mqttClient.connect(MQTT_ID)) {
+    if (mqttClient.connect(THING_ID)) {
       digitalWrite(LED_BUILTIN,HIGH);
       Serial.println("connected\n");
       // ... and resubscribe
