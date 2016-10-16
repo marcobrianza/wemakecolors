@@ -74,8 +74,9 @@ void connect_wifi_or_AP(bool force_config) {
   }
 
   //if you get here you have connected to the WiFi
-  Serial.print("connected to network ");
+  Serial.print("connected to network: ");
   Serial.println(WiFi.SSID());
+
 
   digitalWrite(LED_BUILTIN, HIGH);
   WiFi.mode(WIFI_STA);

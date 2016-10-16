@@ -32,7 +32,7 @@ long lastMsg = 0;
 byte myColor[MSG_LEN];
 int value = 0;
 
-boolean led=LOW;
+boolean led = LOW;
 
 //LEDs
 const int NUM_LEDS = 9;
@@ -67,9 +67,9 @@ void setup() {
   FastLED.show();
 
   pinMode(IN_PIN, INPUT);
-  pinMode(LED_BUILTIN,OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(CONFIG_PIN, INPUT_PULLUP);
-  
+
 
   int i = digitalPinToInterrupt(IN_PIN);
   attachInterrupt(i, presence_isr, RISING);
@@ -122,7 +122,7 @@ void rnd_color() {
 
 
 void presence_isr() {
-  static unsigned long lastMillis = MIN_TIME+1; // this initialization enables to generate a new color at startup
+  static unsigned long lastMillis = MIN_TIME + 1; // this initialization enables to generate a new color at startup
   if (abs(millis() - lastMillis) > MIN_TIME) {
     newPresence = true;
     lastMillis = millis();
@@ -133,8 +133,8 @@ void presence_isr() {
 void connect_wifi_or_AP(bool force_config) {
   digitalWrite(LED_BUILTIN, LOW);
 
-//  WiFi.disconnect();
-//  delay(100);
+  //  WiFi.disconnect();
+  //  delay(100);
 
   WiFiManager wifiManager;
   wifiManager.setDebugOutput(true);
@@ -142,13 +142,15 @@ void connect_wifi_or_AP(bool force_config) {
 
   if ((digitalRead(CONFIG_PIN) == LOW) || (force_config == true)) { //config must be done
     wifiManager.setConfigPortalTimeout(0);
-    //wifiManager.resetSettings(); //reset saved settings
+    wifiManager.resetSettings(); //reset saved settings
     wifiManager.startConfigPortal(THING_ID);
   } else
   {
-    wifiManager.setConfigPortalTimeout(60);
+    wifiManager.setConfigPortalTimeout(180);
     wifiManager.autoConnect(THING_ID);
   }
+
+  WiFi.mode(WIFI_STA);
 
   boolean led = false;
   while (WiFi.status() != WL_CONNECTED) {
@@ -163,7 +165,6 @@ void connect_wifi_or_AP(bool force_config) {
   Serial.println(WiFi.SSID());
 
   digitalWrite(LED_BUILTIN, HIGH);
-  WiFi.mode(WIFI_STA);
 
 }
 
@@ -194,11 +195,11 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 void reconnectMQTT() {
   // Loop until we're reconnected
   while (!mqttClient.connected()) {
-    digitalWrite(LED_BUILTIN,LOW);
+    digitalWrite(LED_BUILTIN, LOW);
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
     if (mqttClient.connect(THING_ID)) {
-      digitalWrite(LED_BUILTIN,HIGH);
+      digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("connected\n");
       // ... and resubscribe
       mqttClient.subscribe(MQTT_TOPIC);

@@ -1,45 +1,29 @@
 #include <ESP8266WiFi.h>
-
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 
-const char* SSID = "sonny";
-const char* PASSWORD = "youyouyou";
+// Update these with values suitable for your network.
+const char* SSID = "...";
+const char* PASSWORD = "...";
+
+const char *AP_SSID = "thingAP";
+const char *AP_PASSWORD = "password";
+
 const char* OTA_PASSWORD = "12345678";
-char* THING_ID = "OTA-11:22:33:44:55:66"; // (mac will be changed automatically)
 
-
-boolean led=LOW;
+boolean led = LOW;
 
 void setup() {
   Serial.begin(115200);
   delay(2000);
-  Serial.print("\ntest OTA, ");
+  Serial.println("\ntest OTA");
 
-  byte ma[6];  WiFi.macAddress(ma);
-  sprintf(THING_ID, "OTA-%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
-
-  Serial.println(THING_ID);
-
-  pinMode(LED_BUILTIN, OUTPUT);
-
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-
-  WiFi.begin(SSID, PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(200);
-    digitalWrite(LED_BUILTIN,led);
-    led=!led;
-  }
-  IPAddress ip = WiFi.localIP();
-  Serial.println("\nWiFi connected to network "+WiFi.SSID());
-  Serial.print("IP address: ");  Serial.println(ip);
-
+  //connect_wifi();
+  startAP();
 
   setupOTA();
+
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 
@@ -47,14 +31,19 @@ void loop() {
 
   ArduinoOTA.handle();
   delay(1000);
-  digitalWrite(LED_BUILTIN,led);
+  digitalWrite(LED_BUILTIN, led);
   Serial.println(led);
-  led=!led;
-  
+  led = !led;
+
 }
 
 
+
 void setupOTA() {
+  char* THING_ID = "OTA-11:22:33:44:55:66"; // (mac will be changed automatically)
+  byte ma[6];  WiFi.macAddress(ma);
+  sprintf(THING_ID, "OTA-%02X:%02X:%02X:%02X:%02X:%02X", ma[0], ma[1], ma[2], ma[3], ma[4], ma[5]);
+  Serial.println(THING_ID);
 
   ArduinoOTA.setPort(8266); // Port defaults to 8266
   ArduinoOTA.setHostname(THING_ID);   // Hostname defaults to esp8266-[ChipID]
@@ -81,4 +70,35 @@ void setupOTA() {
   ArduinoOTA.begin();
   Serial.println("OTA Ready");
 }
+
+
+///----- Wi-Fi-----------------------------
+
+
+void startAP() {
+  IPAddress ip(1, 1, 1, 1);
+  IPAddress nm(255, 255, 255, 0);
+  WiFi.softAPConfig(ip, ip, nm);
+  WiFi.softAP(AP_SSID, AP_PASSWORD);
+  Serial.println("AP started");
+}
+
+void connect_wifi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  Serial.print("Connecting to "); Serial.println(SSID);
+  WiFi.begin(SSID, PASSWORD);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  IPAddress ip = WiFi.localIP();
+  Serial.println("WiFi connected");
+  Serial.print("IP address: ");
+  Serial.println(ip);
+}
+
 

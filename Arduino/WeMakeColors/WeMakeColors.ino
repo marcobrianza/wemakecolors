@@ -138,8 +138,10 @@ void connect_wifi() {
 
   WiFi.disconnect();
   delay(100);
-  Serial.print("\nConnecting to network: "); Serial.println(SSID);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
+  
+  Serial.print("\nConnecting to network: "); Serial.println(SSID);
 
  boolean led=false;
   while (WiFi.status() != WL_CONNECTED) {

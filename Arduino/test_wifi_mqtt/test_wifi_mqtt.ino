@@ -105,6 +105,7 @@ void connect_wifi() {
   delay(100);
   // We start by connecting to a WiFi network
   Serial.print("Connecting to "); Serial.println(SSID);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
