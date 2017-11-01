@@ -3,10 +3,11 @@
 //
 // test LEDs
 
-#include "FastLED.h"
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#include <FastLED.h>
 
 #if defined(ESP8266)
-#define LED_DATA_PIN 1 //it was D1 with previous lib version
+#define LED_DATA_PIN 5 //D2 is GPIO5
 //#define FASTLED_ALLOW_INTERRUPTS 0
 #endif
 

@@ -1,9 +1,6 @@
 
 
 #include <ESP8266WiFi.h>
-#define IN_PIN D2
-#define LED_DATA_PIN 1
-#define CONFIG_PIN 0  //set to GND at startup to force config using builtin button
 
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
@@ -13,13 +10,19 @@
 #include <ArduinoOTA.h>
 
 #include <PubSubClient.h>
-#include "FastLED.h"
+
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#include <FastLED.h>
+
+#define IN_PIN D2
+#define LED_DATA_PIN 5 // D2 is GPIO5
+#define CONFIG_PIN 0  // set to GND at startup to force config using builtin button
 
 const char* OTA_PASSWORD = "12345678";
 
 char* THING_ID = "WeMakeColors-11:22:33:44:55:66"; // THING_ID (will be changed automatically on ESP8266)
 
-const char* MQTT_SERVER = "net.marcobrianza.it";
+const char* MQTT_SERVER = "wmc.marcobrianza.it";
 const int MQTT_PORT = 1883;
 const char* MQTT_TOPIC =   "/WeMakeColors/color";
 

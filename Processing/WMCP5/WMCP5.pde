@@ -3,7 +3,7 @@
 
 String clientID= "processingColor";  // *** Change the Client ID for each client ***//
 
-String mqttURL="mqtt://net.marcobrianza.it:1883";
+String mqttURL="mqtt://wmc.marcobrianza.it:1883";
 import mqtt.*; // MQTT library by Joel Gaehwiler (use add library from the menu)
 MQTTClient client;
 
