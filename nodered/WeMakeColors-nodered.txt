@@ -1,0 +1,217 @@
+[
+    {
+        "id": "24e2fff5.8e31e",
+        "type": "tab",
+        "label": "WeMakeColors"
+    },
+    {
+        "id": "9dfacebf.88269",
+        "type": "inject",
+        "z": "24e2fff5.8e31e",
+        "name": "",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "x": 122.5,
+        "y": 215,
+        "wires": [
+            [
+                "91c1f08a.cf3a4"
+            ]
+        ]
+    },
+    {
+        "id": "91c1f08a.cf3a4",
+        "type": "function",
+        "z": "24e2fff5.8e31e",
+        "name": "random color",
+        "func": "\nvar array = new Uint8Array(3);\n\narray[0] = Math.random() * 15;\narray[1] = Math.random() * 15;\narray[2] = Math.random() * 15;\n\n\nbu=new Buffer(array)\nvar newMsg = { payload: bu };\n\nreturn newMsg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 319.5,
+        "y": 220,
+        "wires": [
+            [
+                "bfa1409d.0ca74"
+            ]
+        ]
+    },
+    {
+        "id": "bfa1409d.0ca74",
+        "type": "mqtt out",
+        "z": "24e2fff5.8e31e",
+        "name": "",
+        "topic": "/WeMakeColors/color",
+        "qos": "",
+        "retain": "",
+        "broker": "7311599b.6bd6b8",
+        "x": 564.5,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "560c032e.b9441c",
+        "type": "mqtt in",
+        "z": "24e2fff5.8e31e",
+        "name": "",
+        "topic": "/WeMakeColors/color",
+        "qos": "2",
+        "broker": "7311599b.6bd6b8",
+        "x": 150.5,
+        "y": 470,
+        "wires": [
+            [
+                "8875bbff.1bd1c8"
+            ]
+        ]
+    },
+    {
+        "id": "5ffecd45.d60de4",
+        "type": "ui_button",
+        "z": "24e2fff5.8e31e",
+        "name": "",
+        "group": "d0b4d42e.7a7688",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Random Color",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "",
+        "x": 119.5,
+        "y": 298,
+        "wires": [
+            [
+                "91c1f08a.cf3a4"
+            ]
+        ]
+    },
+    {
+        "id": "8875bbff.1bd1c8",
+        "type": "function",
+        "z": "24e2fff5.8e31e",
+        "name": "decode color",
+        "func": "node.log(\"new message\")\n\nvar array = new Uint8Array(3);\narray=msg.payload;\n\n//var r=msg.payload.buffer[0];\n//var g=msg.payload.buffer[1];\n//var b=msg.payload.buffer[2];\nvar r=array[0];\nvar g=array[1];\nvar b=array[2];\n\nnode.log(r);\nnode.log(g);\nnode.log(b);\n\nmsg.Background=\"#00FF00\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 388.5,
+        "y": 470,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e8f3ede5.8d67",
+        "type": "debug",
+        "z": "24e2fff5.8e31e",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 450.5,
+        "y": 108,
+        "wires": []
+    },
+    {
+        "id": "502f2e90.4af54",
+        "type": "ui_colour_picker",
+        "z": "24e2fff5.8e31e",
+        "name": "",
+        "label": "",
+        "group": "d0b4d42e.7a7688",
+        "format": "rgb",
+        "outformat": "object",
+        "showSwatch": true,
+        "showPicker": false,
+        "showValue": false,
+        "showAlpha": false,
+        "showLightness": true,
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 123.5,
+        "y": 368,
+        "wires": [
+            [
+                "441228de.7ac208"
+            ]
+        ]
+    },
+    {
+        "id": "441228de.7ac208",
+        "type": "function",
+        "z": "24e2fff5.8e31e",
+        "name": "pick color",
+        "func": "\nvar array = new Uint8Array(3);\n\nvar r = msg.payload.r;\nvar g = msg.payload.g;\nvar b = msg.payload.b;\n\narray[0]=r/16;\narray[1]=g/16;\narray[2]=b/16;\n\nnode.log(\"colore\",r,g,b);\n\nbu=new Buffer(array)\nvar newMsg = { payload: bu };\n\nreturn newMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 345.5,
+        "y": 367,
+        "wires": [
+            [
+                "bfa1409d.0ca74"
+            ]
+        ]
+    },
+    {
+        "id": "12607667.8dd77a",
+        "type": "mosca in",
+        "z": "24e2fff5.8e31e",
+        "mqtt_port": 1883,
+        "mqtt_ws_port": 8080,
+        "name": "",
+        "dburl": "",
+        "x": 138,
+        "y": 108,
+        "wires": [
+            [
+                "e8f3ede5.8d67"
+            ]
+        ]
+    },
+    {
+        "id": "7311599b.6bd6b8",
+        "type": "mqtt-broker",
+        "z": "",
+        "broker": "yunshield.local",
+        "port": "1883",
+        "clientid": "nodino",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "d0b4d42e.7a7688",
+        "type": "ui_group",
+        "z": "",
+        "name": "Color",
+        "tab": "bb3db2f9.b4222",
+        "order": 1,
+        "disp": true,
+        "width": "6"
+    },
+    {
+        "id": "bb3db2f9.b4222",
+        "type": "ui_tab",
+        "z": "24e2fff5.8e31e",
+        "name": "WeMakeColors",
+        "icon": "dashboard",
+        "order": 1
+    }
+]
