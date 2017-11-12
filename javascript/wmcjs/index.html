@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>We Make Color</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="mqttws31.js" type="text/javascript"></script>
+    <script src="jquery.min.js" type="text/javascript"></script>
+
+    <script src="script.js" type="text/javascript"></script>
+
+    <!-- Google Fonts embed code -->
+    <script type="text/javascript">
+        (function() {
+            var link_element = document.createElement("link"),
+                s = document.getElementsByTagName("script")[0];
+            if (window.location.protocol !== "http:" && window.location.protocol !== "https:") {
+                link_element.href = "http:";
+            }
+            link_element.href += "//fonts.googleapis.com/css?family=Molengo:400";
+            link_element.rel = "stylesheet";
+            link_element.type = "text/css";
+            s.parentNode.insertBefore(link_element, s);
+        })();
+    </script>
+
+    <style>
+      body, p, h1 {
+        font-family: 'Molengo';
+      }
+      li.color-block {
+        width: 80px;
+        height: 80px;
+        border: 1px solid black;
+        list-style-type: none;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>We Make Color</h1>
+    <p>A distributed artwork for random color generation,<br/>
+      <a href="http://www.marcobrianza.it/wemakecolors"> http://www.marcobrianza.it/wemakecolors </a> <br/>
+      At <a href="http://wemake.cc/"> WeMake </a>
+    </p>
+    <div>
+        Status: <input type='text' id='status' size="80" disabled />
+    </div>
+        <ul id='ws' style="font-family: 'Courier New', Courier, monospace;"></ul>
+
+  </body>
+</html>
