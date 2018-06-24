@@ -1,15 +1,13 @@
-// test software for We Make Colors
+// test software for WeMakeColors
 // Marco Brianza - April 9th 2016
 //
 // test LEDs
 
-
-
-#define FASTLED_ESP8266_RAW_PIN_ORDER
+//#define FASTLED_ESP8266_RAW_PIN_ORDER
 #include <FastLED.h>
 
 #if defined(ESP8266)
-#define LED_DATA_PIN 5 //D1 is GPIO5
+#define LED_DATA_PIN D1 //D1 is GPIO5
 //#define FASTLED_ALLOW_INTERRUPTS 0
 #endif
 
@@ -19,7 +17,7 @@
 
 
 #define NUM_LEDS 9
-#define GLOBAL_BRIGHTNESS 255
+int GLOBAL_BRIGHTNESS 255
 #define MAX_C 16
 
 CRGB leds[NUM_LEDS];
@@ -27,26 +25,20 @@ CRGB leds[NUM_LEDS];
 #include <ESP8266WiFi.h>
 
 void setup() {
-  WiFi.mode(WIFI_OFF);
-
   Serial.begin(115200);
   delay(2000);
   Serial.println("\n test LEDs");
 
+  WiFi.mode(WIFI_OFF);
+
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
-
-
-
   FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds, NUM_LEDS);
-  //memset(leds, 0, NUM_LEDS * 3);
-
 
   randomSeed(analogRead(A0));
 
   for (int i = 0; i < NUM_LEDS - 1; i++) {
     leds[i] = newRndColor();
   }
-
   FastLED.show();
 }
 
@@ -60,7 +52,7 @@ void loop() {
   leds[NUM_LEDS - 1] = newRndColor();
   FastLED.show();
 
-  delay(6000);
+  delay(10000);
 }
 
 byte cal_lut(byte c) {

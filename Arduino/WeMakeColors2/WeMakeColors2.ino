@@ -67,6 +67,7 @@ void setup() {
   FastLED.setBrightness(GLOBAL_BRIGHTNESS);
   FastLED.addLeds<WS2812B, LED_DATA_PIN, LED_ORDER>(leds, NUM_LEDS);
   memset(leds, 0, NUM_LEDS * 3);
+  leds[0] = CRGB(64, 64, 64);
   FastLED.show();
 
   pinMode(IN_PIN, INPUT);
@@ -149,7 +150,7 @@ void connect_wifi_or_AP(bool force_config) {
     wifiManager.startConfigPortal(THING_ID);
   } else
   {
-    wifiManager.setConfigPortalTimeout(180);
+    wifiManager.setConfigPortalTimeout(600);
     wifiManager.autoConnect(THING_ID);
   }
 
@@ -168,7 +169,8 @@ void connect_wifi_or_AP(bool force_config) {
   Serial.println(WiFi.SSID());
 
   digitalWrite(LED_BUILTIN, HIGH);
-
+  leds[0] = CRGB(0, 64, 0);
+  FastLED.show();
 }
 
 
@@ -201,6 +203,7 @@ void reconnectMQTT() {
     digitalWrite(LED_BUILTIN, LOW);
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
+     wifiClient = WiFiClient(); // workaround to fix reconnection
     if (mqttClient.connect(THING_ID)) {
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("connected\n");
