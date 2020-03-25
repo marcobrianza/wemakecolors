@@ -59,6 +59,14 @@ byte R, G, B; //color received from remote
 
 CRGB leds[NUM_LEDS];
 
+void ICACHE_RAM_ATTR presence_isr() {
+  static unsigned long lastMillis = MIN_TIME + 1; // this initialization enables to generate a new color at startup
+  if (abs(millis() - lastMillis) > MIN_TIME) {
+    newPresence = true;
+    lastMillis = millis();
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   delay(2000);
@@ -125,13 +133,7 @@ void rnd_color() {
 }
 
 
-void presence_isr() {
-  static unsigned long lastMillis = MIN_TIME + 1; // this initialization enables to generate a new color at startup
-  if (abs(millis() - lastMillis) > MIN_TIME) {
-    newPresence = true;
-    lastMillis = millis();
-  }
-}
+
 
 
 void connect_wifi_or_AP(bool force_config) {
@@ -203,7 +205,7 @@ void reconnectMQTT() {
     digitalWrite(LED_BUILTIN, LOW);
     Serial.print("\nAttempting MQTT connection...");
     // Attempt to connect
-     wifiClient = WiFiClient(); // workaround to fix reconnection
+    wifiClient = WiFiClient(); // workaround to fix reconnection
     if (mqttClient.connect(THING_ID)) {
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("connected\n");
@@ -253,5 +255,3 @@ void setupOTA() {
   ArduinoOTA.begin();
   Serial.println("OTA Ready");
 }
-
-
