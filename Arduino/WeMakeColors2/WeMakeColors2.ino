@@ -44,7 +44,7 @@ const int NUM_LEDS = 9;
 
 //presence
 //#define IN_PIN D2 //defined in core selection
-const unsigned int MIN_TIME = 60000; //delay between new color
+const unsigned int MIN_TIME = 6000; //delay between new color
 volatile boolean newPresence = false;
 
 //random color
