@@ -1,18 +1,20 @@
+// tested on ESP8266 Core 2.7.4
+// https://arduino.esp8266.com/stable/package_esp8266com_index.json
+// board NodeMCU 1.0
 
+#include <ESP8266WiFi.h> // built in ESP8266 Core
 
-#include <ESP8266WiFi.h>
+#include <DNSServer.h> // built in ESP8266 Core
+#include <ESP8266WebServer.h> // built in ESP8266 Core
+#include <WiFiManager.h>   // version 0.15.0  
 
-#include <DNSServer.h>
-#include <ESP8266WebServer.h>
-#include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
+#include <ESP8266mDNS.h> // built in ESP8266 Core
+#include <ArduinoOTA.h> // built in ESP8266 Core
 
-#include <ESP8266mDNS.h>
-#include <ArduinoOTA.h>
-
-#include <PubSubClient.h>
+#include <PubSubClient.h> // version 2.8.0
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#include <FastLED.h>
+#include <FastLED.h> // version  3.3.3
 
 #define IN_PIN D2
 #define LED_DATA_PIN 5 // D2 is GPIO5
